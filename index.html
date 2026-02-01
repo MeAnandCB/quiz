@@ -458,7 +458,7 @@
 
     <div class="stage">
         <div class="wheel" id="wheel"></div>
-        <div class="center-circle">ROUND 1</div>
+        <div class="center-circle">Battle of Brain</div>
     </div>
 
     <div class="modal" id="modal">
@@ -467,25 +467,42 @@
             <h2 id="qNo"></h2>
             <p id="qText"></p>
             <div class="actions">
-                <button class="right" onclick="answer(true)">RIGHT</button>
-                <button class="wrongBtn" onclick="answer(false)">WRONG</button>
+                <button id="checkBtn" class="check" onclick="checkAnswer(activeSlot.innerText)"
+                    style="display: none;">Check Answer</button>
+                <button class="right" onclick="answer(true)" style="display: none;">RIGHT</button>
+                <button class="wrongBtn" onclick="answer(false)" style="display: none;">WRONG</button>
             </div>
         </div>
     </div>
 
+    <!-- ...existing code... -->
     <script>
         /* QUESTIONS (10 ONLY) */
         const questions = {
-            1: "What does AI stand for?",
-            2: "Who is known as the father of AI?",
-            3: "Which AI model is used for chatbots?",
-            4: "AI that mimics the human brain is called?",
-            5: "What does ML stand for?",
-            6: "Which company created ChatGPT?",
-            7: "AI used in self-driving cars?",
-            8: "Which language is popular for AI?",
-            9: "What is Deep Learning?",
-            10: "AI that can think like humans?"
+            1: "Which dataset is commonly used to train YOLO?",
+            2: "Ensemble Learning' technique that trains multiple models sequentially, where each new model corrects errors made by the previous one?",
+            3: "What problem occurs when gradients shrink to zero in deep networks? ",
+            4: "What are numeric vector representations of text called?",
+            5: "Which company build Grok   ",
+            6: "Which company developed Copilot ",
+            7: "Which conversion reduces 3-channel RGB to a 1-channel image?",
+            8: "Which parameter controls the randomness or 'creativity' of an LLM's output?",
+            9: "What is the process of reducing model size by converting weights to lower-precision formats (e.g., FP16 to INT8)?",
+            10: "What is the name of Meta's open-source LLM family?"
+        };
+
+        // Add answers object
+        const answers = {
+            1: "COCO",
+            2: "Boosting",
+            3: "Vanishing Gradient",
+            4: "Embeddings",
+            5: "xAI (Elon Musk’s AI company)",
+            6: "Microsoft",
+            7: " Grayscale",
+            8: "Temperature",
+            9: "Quantization",
+            10: "Llama"
         };
 
         const wheel = document.getElementById("wheel");
@@ -493,11 +510,15 @@
         const timer = document.getElementById("timer");
         const qNo = document.getElementById("qNo");
         const qText = document.getElementById("qText");
+        const actions = document.querySelector(".actions");
+        const checkBtn = document.getElementById("checkBtn");
+        const rightBtn = document.querySelector(".right");
+        const wrongBtn = document.querySelector(".wrongBtn");
 
         let activeSlot, countdown;
 
         /* CREATE 10 SLOTS */
-        const total = 10, radius = 190, center = 260;
+        const total = 15, radius = 190, center = 260;
 
         for (let i = 1; i <= total; i++) {
             const angle = (i / total) * Math.PI * 2;
@@ -518,6 +539,7 @@
             timer.innerText = t;
             qNo.innerText = "";
             qText.innerText = "";
+            actions.style.display = "none"; // Hide actions during timer
 
             countdown = setInterval(() => {
                 t--;
@@ -527,8 +549,19 @@
                     timer.style.display = "none";
                     qNo.innerText = "Question " + num;
                     qText.innerText = questions[num];
+                    actions.style.display = "flex"; // Show actions after timer
+                    checkBtn.style.display = "block"; // Show Check Answer button
+                    rightBtn.style.display = "none";
+                    wrongBtn.style.display = "none";
                 }
             }, 1000);
+        }
+
+        function checkAnswer(num) {
+            qText.innerText = answers[num]; // Show answer
+            checkBtn.style.display = "none"; // Hide Check Answer
+            rightBtn.style.display = "inline-block";
+            wrongBtn.style.display = "inline-block";
         }
 
         function answer(correct) {
@@ -561,6 +594,7 @@
             setTimeout(() => document.body.classList.remove("fail"), 400);
         }
     </script>
+    <!-- ...existing code... -->
 
 </body>
 
