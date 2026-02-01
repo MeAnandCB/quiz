@@ -1,0 +1,567 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Quiz Arena</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            background: radial-gradient(circle at top, #0a1a3f, #050b1e);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        /* TITLE */
+        h1 {
+            color: #00e5ff;
+            text-shadow: 0 0 20px #00e5ff;
+        }
+
+        /* CIRCLE GRID */
+        .circle-grid {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 40px auto;
+        }
+
+        .card {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #00e5ff;
+            box-shadow: 0 0 15px #00e5ff;
+            transition: 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.15);
+        }
+
+        .card.correct {
+            background: #00ff88;
+            border-color: #00ff88;
+            box-shadow: 0 0 25px #00ff88;
+        }
+
+        .card.wrong {
+            background: #ff3b3b;
+            border-color: #ff3b3b;
+            box-shadow: 0 0 25px #ff3b3b;
+        }
+
+        .card.used {
+            pointer-events: none;
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #0a1a3f;
+            padding: 30px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 20px;
+            border: 2px solid #7b61ff;
+            box-shadow: 0 0 30px #7b61ff;
+            animation: slideUp 0.6s ease;
+            text-align: center;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(80px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .timer {
+            font-size: 28px;
+            color: #00e5ff;
+            margin-bottom: 15px;
+        }
+
+        /* BUTTONS */
+        .actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 25px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .correct-btn {
+            background: #00ff88;
+        }
+
+        .wrong-btn {
+            background: #ff3b3b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🤖 AI Quiz Arena</h1>
+        <div class="circle-grid" id="quizGrid"></div>
+    </div>
+
+    <div class="modal" id="questionModal">
+        <div class="modal-content">
+            <div class="timer" id="timerText">3</div>
+            <h2 id="questionNumber"></h2>
+            <p id="questionText"></p>
+
+            <div class="actions">
+                <button class="correct-btn" onclick="markAnswer(true)">✔ Right</button>
+                <button class="wrong-btn" onclick="markAnswer(false)">✖ Wrong</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = {
+            1: "What does AI stand for?",
+            2: "Who is the father of AI?",
+            3: "Which model powers ChatGPT?",
+            4: "What is Machine Learning?",
+            5: "One real-life AI application?",
+            6: "What does NLP mean?",
+            7: "DeepMind belongs to?",
+            8: "What is a neural network?",
+            9: "Human-like AI is called?",
+            10: "AI that defeated chess champion?"
+        };
+
+        const grid = document.getElementById("quizGrid");
+        let activeCard = null;
+        let countdown;
+
+        /* CREATE CIRCLE */
+        const total = 10;
+        const radius = 160;
+        const center = 200;
+
+        for (let i = 1; i <= total; i++) {
+            const angle = (i / total) * (2 * Math.PI);
+            const x = center + radius * Math.cos(angle) - 30;
+            const y = center + radius * Math.sin(angle) - 30;
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerText = i;
+            card.style.left = `${x}px`;
+            card.style.top = `${y}px`;
+
+            card.onclick = () => startTimer(i, card);
+            grid.appendChild(card);
+        }
+
+        function startTimer(num, card) {
+            activeCard = card;
+            let time = 3;
+            document.getElementById("questionModal").style.display = "flex";
+            document.getElementById("timerText").innerText = time;
+            document.getElementById("questionText").innerText = "";
+
+            countdown = setInterval(() => {
+                time--;
+                document.getElementById("timerText").innerText = time;
+                if (time === 0) {
+                    clearInterval(countdown);
+                    showQuestion(num);
+                }
+            }, 1000);
+        }
+
+        function showQuestion(num) {
+            document.getElementById("timerText").style.display = "none";
+            document.getElementById("questionNumber").innerText = "Question " + num;
+            document.getElementById("questionText").innerText = questions[num];
+        }
+
+        function markAnswer(correct) {
+            activeCard.classList.add("used");
+            activeCard.classList.add(correct ? "correct" : "wrong");
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById("questionModal").style.display = "none";
+            document.getElementById("timerText").style.display = "block";
+        }
+    </script>
+
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Quiz Arena – Celebration Mode</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            background:
+                radial-gradient(circle, rgba(129, 5, 151, 0.35), rgba(18, 0, 22, 0.35)),
+                url("./images/bg.jpg");
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* STAGE */
+        .stage {
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, #a1002c, #5b0017);
+            transform: rotate(45deg);
+            border: 12px solid gold;
+            border-radius: 40px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+        }
+
+        /* CENTER */
+        .center-circle {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, #ff003c, #7a001c);
+            border-radius: 50%;
+            border: 10px solid gold;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-45deg);
+            position: relative;
+        }
+
+        /* QUESTION STYLES */
+        #qNo {
+            font-size: 24px;
+            color: gold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.9);
+        }
+
+        #qText {
+            font-size: 32px;
+            line-height: 1.6;
+            text-shadow: 0 0 8px rgba(255, 0, 150, 0.4);
+        }
+
+        /* SLOT */
+        .slot {
+            position: absolute;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff5bbd, #a1006b);
+            border: 4px solid gold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px gold;
+            transition: 0.3s;
+        }
+
+        .slot:hover {
+            transform: scale(1.2);
+        }
+
+        .slot.correct {
+            background: #00ff88;
+            border-color: #00ff88;
+        }
+
+        .slot.wrong {
+            background: #ff3b3b;
+            border-color: #ff3b3b;
+        }
+
+        .slot.used {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: #1b0033;
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid gold;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(80px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .timer {
+            font-size: 32px;
+            color: gold;
+        }
+
+        .actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        button {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            font-family: 'Orbitron';
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .right {
+            background: #00ff88;
+        }
+
+        .wrongBtn {
+            background: #ff3b3b;
+        }
+
+        /* CONFETTI */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* FAIL EFFECT */
+        .fail {
+            animation: shake 0.4s;
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            50% {
+                transform: translateX(10px);
+            }
+
+            75% {
+                transform: translateX(-10px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stage">
+        <div class="wheel" id="wheel"></div>
+        <div class="center-circle">ROUND 1</div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-box">
+            <div class="timer" id="timer">3</div>
+            <h2 id="qNo"></h2>
+            <p id="qText"></p>
+            <div class="actions">
+                <button class="right" onclick="answer(true)">RIGHT</button>
+                <button class="wrongBtn" onclick="answer(false)">WRONG</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* QUESTIONS (10 ONLY) */
+        const questions = {
+            1: "What does AI stand for?",
+            2: "Who is known as the father of AI?",
+            3: "Which AI model is used for chatbots?",
+            4: "AI that mimics the human brain is called?",
+            5: "What does ML stand for?",
+            6: "Which company created ChatGPT?",
+            7: "AI used in self-driving cars?",
+            8: "Which language is popular for AI?",
+            9: "What is Deep Learning?",
+            10: "AI that can think like humans?"
+        };
+
+        const wheel = document.getElementById("wheel");
+        const modal = document.getElementById("modal");
+        const timer = document.getElementById("timer");
+        const qNo = document.getElementById("qNo");
+        const qText = document.getElementById("qText");
+
+        let activeSlot, countdown;
+
+        /* CREATE 10 SLOTS */
+        const total = 10, radius = 190, center = 260;
+
+        for (let i = 1; i <= total; i++) {
+            const angle = (i / total) * Math.PI * 2;
+            const slot = document.createElement("div");
+            slot.className = "slot";
+            slot.innerText = i;
+            slot.style.left = center + radius * Math.cos(angle) - 26 + "px";
+            slot.style.top = center + radius * Math.sin(angle) - 26 + "px";
+            slot.onclick = () => openQuestion(i, slot);
+            wheel.appendChild(slot);
+        }
+
+        function openQuestion(num, slot) {
+            activeSlot = slot;
+            let t = 3;
+            modal.style.display = "flex";
+            timer.style.display = "block";
+            timer.innerText = t;
+            qNo.innerText = "";
+            qText.innerText = "";
+
+            countdown = setInterval(() => {
+                t--;
+                timer.innerText = t;
+                if (t === 0) {
+                    clearInterval(countdown);
+                    timer.style.display = "none";
+                    qNo.innerText = "Question " + num;
+                    qText.innerText = questions[num];
+                }
+            }, 1000);
+        }
+
+        function answer(correct) {
+            activeSlot.classList.add("used", correct ? "correct" : "wrong");
+
+            if (correct) celebrate();
+            else failEffect();
+
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 1200);
+        }
+
+        /* CONFETTI */
+        function celebrate() {
+            for (let i = 0; i < 80; i++) {
+                const c = document.createElement("div");
+                c.className = "confetti";
+                c.style.left = Math.random() * 100 + "vw";
+                c.style.background = `hsl(${Math.random() * 360},100%,50%)`;
+                c.style.animationDuration = 2 + Math.random() * 2 + "s";
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 3000);
+            }
+        }
+
+        /* FAIL SHAKE */
+        function failEffect() {
+            document.body.classList.add("fail");
+            setTimeout(() => document.body.classList.remove("fail"), 400);
+        }
+    </script>
+
+</body>
+
+</html>
