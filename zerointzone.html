@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Zero hint Zone</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: url("./images/round2.jpg") no-repeat center center/cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .quiz-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #ccff00;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px #eeff00;
+        }
+
+        /* QUESTION + ANSWER BOX */
+        .qa-box {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 45px 55px;
+            max-width: 85%;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .qa-box:hover {
+            transform: scale(1.02);
+        }
+
+        .question {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .answer {
+            font-size: 2rem;
+            color: #00ff00;
+            display: none;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .controls {
+            display: flex;
+            gap: 30px;
+        }
+
+        .controls button {
+            padding: 15px 35px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00ffff, #00ff99);
+            color: #000;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .controls button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 1);
+        }
+
+        .controls button:disabled {
+            background: #444;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* CONFETTI */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: 0;
+            animation: fall 1.2s linear forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(700px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .qa-box {
+                padding: 25px;
+                max-width: 95%;
+            }
+
+            .question {
+                font-size: 1.4rem;
+            }
+
+            .answer {
+                font-size: 1.3rem;
+            }
+
+            .controls button {
+                font-size: 1.1rem;
+                padding: 12px 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="quiz-container" id="quizContainer">
+        <h1>Zero hint Zone</h1>
+
+        <div class="qa-box">
+            <div class="question" id="question"></div>
+            <div class="answer" id="answer"></div>
+        </div>
+
+        <div class="controls">
+            <button id="checkBtn">CHECK ANSWER</button>
+            <button id="nextBtn" disabled>NEXT QUESTION</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                q: "What is the name of the latest Google AI model that powers advanced features like multimodal understanding?",
+                ans: "Gemini 3"
+            },
+            {
+                q: "What tool integrated with Gemini lets users generate and edit images directly inside apps and browsers?",
+                ans: "Nano Banana (or Nano Banana Pro)"
+            },
+            {
+                q: "What is the full form of RAG?",
+                ans: "Retrieval-Augmented Generation"
+            },
+            {
+                q: "Which country granted citizenship to a robot for the first time in history?",
+                ans: "Saudi Arabia"
+            },
+            {
+                q: "Which company introduced the first widely recognized AI self-driving car project?",
+                ans: "Google (now Waymo)"
+            },
+            {
+                q: "What does GPT stand for in AI?",
+                ans: "Generative Pre-trained Transformer"
+            },
+            {
+                q: "Who is called the father of Artificial Intelligence?",
+                ans: "John McCarthy"
+            },
+            {
+                q: "The user's input instruction to a GenAI model is called?",
+                ans: "Prompt"
+            },
+            {
+                q: "Which machine learning algorithm is used for predicting continuous values?",
+                ans: "Regression"
+            },
+            {
+                q: "What do we call an AI system that operates on its own, learning from the environment and performing tasks without direct human control?",
+                ans: "Agent AI"
+            },
+            {
+                q: "How many landmarks does MediaPipe Face Mesh provide?",
+                ans: "468 landmarks"
+            },
+            {
+                q: "What is the small weight matrix used in convolutions called?",
+                ans: "Kernel / Filter"
+            },
+            {
+                q: "What is the name given to AI models that can generate content?",
+                ans: "Generative AI"
+            }
+        ];
+
+        let current = 0;
+
+        const questionEl = document.getElementById("question");
+        const answerEl = document.getElementById("answer");
+        const checkBtn = document.getElementById("checkBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        function loadQuestion() {
+            questionEl.textContent = `Q${current + 1}. ${quizData[current].q}`;
+            answerEl.style.display = "none";
+            answerEl.textContent = "";
+            checkBtn.disabled = false;
+            nextBtn.disabled = true;
+        }
+
+        checkBtn.onclick = () => {
+            answerEl.textContent = `✔ Answer: ${quizData[current].ans}`;
+            answerEl.style.display = "block";
+            checkBtn.disabled = true;
+            nextBtn.disabled = false;
+            createConfetti();
+        };
+
+        nextBtn.onclick = () => {
+            current++;
+            if (current < quizData.length) {
+                loadQuestion();
+            } else {
+                alert("🎉 QUIZ COMPLETED!");
+            }
+        };
+
+        function createConfetti() {
+            for (let i = 0; i < 40; i++) {
+                const confetti = document.createElement("div");
+                confetti.className = "confetti";
+                confetti.style.left = Math.random() * window.innerWidth + "px";
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360},100%,50%)`;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 1500);
+            }
+        }
+
+        loadQuestion();
+    </script>
+
+
+</body>
+
+</html>

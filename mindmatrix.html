@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>MIND MATRIX</title>
+
     <style>
         * {
             box-sizing: border-box;
@@ -13,29 +14,32 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
             height: 100%;
             width: 100%;
+            font-family: 'Segoe UI', Arial, sans-serif;
             overflow: hidden;
         }
 
+        /* ✅ BACKGROUND IMAGE */
         body {
-            background: radial-gradient(circle at top, #0f2027, #203a43, #000);
-            color: #fff;
+            background: url("images/round3.jpg") no-repeat center center / cover;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: #fff;
         }
 
+        /* ✅ GLASS OVERLAY */
         .quiz-container {
             width: 100vw;
             height: 100vh;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            transition: background 0.3s;
             padding: 40px;
         }
 
@@ -96,7 +100,6 @@
         .controls {
             margin-top: 40px;
             display: flex;
-            justify-content: center;
             gap: 30px;
         }
 
@@ -109,7 +112,6 @@
             color: #000;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
         }
 
         .controls button:disabled {
@@ -117,27 +119,23 @@
             cursor: not-allowed;
         }
 
+        /* 🎉 CONFETTI */
         .confetti {
             position: absolute;
             width: 10px;
             height: 10px;
             top: 0;
-            left: 50%;
             animation: fall 1s linear forwards;
         }
 
         @keyframes fall {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-
-            100% {
+            to {
                 transform: translateY(600px) rotate(720deg);
                 opacity: 0;
             }
         }
 
+        /* ❌ SHAKE */
         .shake {
             animation: shake 0.5s;
         }
@@ -169,32 +167,24 @@
                 grid-template-columns: 1fr;
             }
 
-            .question {
-                font-size: 1.5rem;
-            }
-
             h1 {
                 font-size: 2rem;
             }
 
-            .options button {
-                font-size: 1.2rem;
-                padding: 20px;
-            }
-
-            .controls button {
-                font-size: 1.2rem;
-                padding: 12px 25px;
+            .question {
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 
 <body>
+
     <div class="quiz-container" id="quizContainer">
         <h1>MIND MATRIX</h1>
         <div class="question" id="question"></div>
         <div class="options" id="options"></div>
+
         <div class="controls">
             <button id="checkBtn" disabled>CHECK ANSWER</button>
             <button id="nextBtn" disabled>NEXT QUESTION</button>
@@ -205,72 +195,132 @@
         const quizData = [
             {
                 q: "Which type of machine learning involves training a model on a dataset where the target outcomes are already known?",
-                options: ["Unsupervised Learning", "Semi-supervised Learning", "Supervised Learning", "Reinforcement Learning"],
+                options: [
+                    "Unsupervised Learning",
+                    "Semi-supervised Learning",
+                    "Supervised Learning",
+                    "Reinforcement Learning"
+                ],
                 ans: 2
             },
             {
                 q: "In a binary classification problem, which metric is most useful when the classes are highly imbalanced?",
-                options: ["Accuracy", "R-squared", "Mean Squared Error", "F1-Score"],
-                ans: 3
-            },
-            {
-                q: "Which algorithm is commonly used for dimensionality reduction by transforming features into a set of linearly uncorrelated variables?",
-                options: ["K-Nearest Neighbors", "Logistic Regression", "Random Forest", "Principal Component Analysis (PCA)"],
-                ans: 3
-            },
-            {
-                q: "In a confusion matrix for a medical test, what does a 'False Negative' represent?",
                 options: [
-                    "The test correctly identifies a sick person as having the disease.",
-                    "The test predicts a person is healthy, but they actually have the disease.",
-                    "The test correctly identifies a healthy person as healthy.",
-                    "The test predicts a person has the disease, but they are actually healthy."
+                    "Accuracy",
+                    "R-squared",
+                    "Mean Squared Error",
+                    "F1-Score"
+                ],
+                ans: 3
+            },
+            {
+                q: "Which algorithm is commonly used for dimensionality reduction by transforming features into uncorrelated components?",
+                options: [
+                    "K-Nearest Neighbors",
+                    "Logistic Regression",
+                    "Random Forest",
+                    "Principal Component Analysis (PCA)"
+                ],
+                ans: 3
+            },
+            {
+                q: "In a confusion matrix, what does a False Negative represent?",
+                options: [
+                    "Correctly predicting a positive case",
+                    "Predicting negative when the actual value is positive",
+                    "Correctly predicting a negative case",
+                    "Predicting positive when the actual value is negative"
                 ],
                 ans: 1
             },
             {
-                q: "What is the result of a Precision calculation if TP=80 and FP=20?",
-                options: ["0.50", "0.20", "0.80", "1.00"],
+                q: "If True Positives = 80 and False Positives = 20, what is the Precision?",
+                options: [
+                    "0.50",
+                    "0.20",
+                    "0.80",
+                    "1.00"
+                ],
                 ans: 2
             },
             {
-                q: "In OpenCV coordinate systems, where is the origin (0,0) located?",
-                options: ["Top-left corner", "Center of the image", "Bottom-left corner", "Top-right corner"],
+                q: "In OpenCV, where is the origin (0,0) of an image located?",
+                options: [
+                    "Top-left corner",
+                    "Center of the image",
+                    "Bottom-left corner",
+                    "Top-right corner"
+                ],
                 ans: 0
             },
             {
-                q: "Which deep learning model is commonly used in modern OCR?",
-                options: ["KNN", "CNN", "K-Means", "Decision Tree"],
+                q: "Which deep learning model architecture is most commonly used in modern OCR systems?",
+                options: [
+                    "KNN",
+                    "CNN",
+                    "K-Means",
+                    "Decision Tree"
+                ],
                 ans: 1
             },
             {
-                q: "Which backbone network is commonly used in YOLO?",
-                options: ["VGG", "ResNet", "Darknet", "AlexNet"],
+                q: "Which backbone network is traditionally used in YOLO object detection models?",
+                options: [
+                    "VGG",
+                    "ResNet",
+                    "Darknet",
+                    "AlexNet"
+                ],
                 ans: 2
             },
             {
-                q: "Fine-tuning an LLM is useful to:",
-                options: ["Increase model size", "Adapt it to domain-specific tasks", "Reduce tokens", "Remove hallucinations completely"],
+                q: "Why is fine-tuning a Large Language Model (LLM) useful?",
+                options: [
+                    "To increase model size",
+                    "To adapt the model to domain-specific tasks",
+                    "To reduce token usage",
+                    "To completely remove hallucinations"
+                ],
                 ans: 1
             },
             {
-                q: "Cross-validation is mainly used to:",
-                options: ["Increase accuracy", "Reduce training time", "Evaluate model generalization", "Normalize data"],
+                q: "What is the main purpose of cross-validation in machine learning?",
+                options: [
+                    "Increase training accuracy",
+                    "Reduce training time",
+                    "Evaluate model generalization",
+                    "Normalize data"
+                ],
                 ans: 2
             },
             {
-                q: "Which ML algorithm is most sensitive to feature scaling?",
-                options: ["Decision Tree", "KNN", "Random Forest", "Naive Bayes"],
+                q: "Which machine learning algorithm is most sensitive to feature scaling?",
+                options: [
+                    "Decision Tree",
+                    "K-Nearest Neighbors (KNN)",
+                    "Random Forest",
+                    "Naive Bayes"
+                ],
                 ans: 1
             },
             {
-                q: "Backpropagation is used to:",
-                options: ["Initialize weights", "Update weights using gradients", "Normalize inputs", "Perform inference"],
+                q: "What is the primary purpose of backpropagation in neural networks?",
+                options: [
+                    "Initialize weights",
+                    "Update weights using gradients",
+                    "Normalize inputs",
+                    "Perform inference"
+                ],
                 ans: 1
             },
             {
-                q: "Which activation function outputs values between 0 and 1?",
-                options: ["ReLU", "Tanh", "Sigmoid", "Softplus"],
+                q: "Which activation function outputs values strictly between 0 and 1?",
+                options: [
+                    "ReLU",
+                    "Tanh",
+                    "Sigmoid",
+                    "Softplus"
+                ],
                 ans: 2
             }
         ];
@@ -281,18 +331,17 @@
 
         const questionEl = document.getElementById("question");
         const optionsEl = document.getElementById("options");
-        const quizContainer = document.getElementById("quizContainer");
         const checkBtn = document.getElementById("checkBtn");
         const nextBtn = document.getElementById("nextBtn");
+        const quizContainer = document.getElementById("quizContainer");
 
         function loadQuestion() {
             selected = null;
             checkBtn.disabled = true;
             nextBtn.disabled = true;
-            quizContainer.style.background = "radial-gradient(circle at top, #0f2027, #203a43, #000)";
+            optionsEl.innerHTML = "";
 
             questionEl.textContent = `Q${current + 1}. ${quizData[current].q}`;
-            optionsEl.innerHTML = "";
 
             quizData[current].options.forEach((opt, i) => {
                 const btn = document.createElement("button");
@@ -303,8 +352,9 @@
         }
 
         function selectOption(btn, index) {
-            // Only one option selectable
-            document.querySelectorAll(".options button").forEach(b => b.classList.remove("selected"));
+            document.querySelectorAll(".options button")
+                .forEach(b => b.classList.remove("selected"));
+
             btn.classList.add("selected");
             selected = index;
             checkBtn.disabled = false;
@@ -312,26 +362,19 @@
 
         checkBtn.onclick = () => {
             const buttons = document.querySelectorAll(".options button");
-            const correctIndex = quizData[current].ans;
+            const correct = quizData[current].ans;
 
             buttons.forEach((btn, i) => {
-                if (i === correctIndex) btn.classList.add("correct");
-                if (i === selected && selected !== correctIndex) btn.classList.add("wrong");
+                if (i === correct) btn.classList.add("correct");
+                if (i === selected && selected !== correct) btn.classList.add("wrong");
+                btn.disabled = true;
             });
 
-            // Disable selection after checking
-            buttons.forEach(b => b.disabled = true);
-
-            // Correct answer effect
-            if (selected === correctIndex) {
+            if (selected === correct) {
                 createConfetti();
             } else {
                 quizContainer.classList.add("shake");
-                quizContainer.style.background = "radial-gradient(circle at top, #ff0000, #800000, #000)";
-                setTimeout(() => {
-                    quizContainer.classList.remove("shake");
-                    quizContainer.style.background = "radial-gradient(circle at top, #0f2027, #203a43, #000)";
-                }, 500);
+                setTimeout(() => quizContainer.classList.remove("shake"), 500);
             }
 
             nextBtn.disabled = false;
@@ -350,17 +393,17 @@
         function createConfetti() {
             for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement("div");
-                confetti.classList.add("confetti");
+                confetti.className = "confetti";
                 confetti.style.left = Math.random() * window.innerWidth + "px";
-                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                confetti.style.animationDuration = (Math.random() * 1 + 0.5) + "s";
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360},100%,50%)`;
                 document.body.appendChild(confetti);
-                setTimeout(() => confetti.remove(), 1500);
+                setTimeout(() => confetti.remove(), 1200);
             }
         }
 
         loadQuestion();
     </script>
+
 </body>
 
 </html>
