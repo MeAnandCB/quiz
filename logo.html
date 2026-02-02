@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Quiz Arena – Logo Round</title>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Audiowide', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background image with blur */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://img.freepik.com/free-photo/3d-render-abstract-background-with-flowing-particles_1048-14302.jpg?semt=ais_user_personalization&w=740&q=80') no-repeat center center/cover;
+            filter: blur(10px);
+            z-index: -1;
+        }
+
+        .logo-round-container {
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        .logo-display {
+            width: 400px;
+            height: 400px;
+            border: 5px solid gold;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+            animation: fadeIn 0.8s ease;
+            cursor: pointer;
+        }
+
+        .logo-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .logo-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        #logoName {
+            font-size: 32px;
+            color: gold;
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #checkBtn {
+            background: gold;
+            color: #120016;
+        }
+
+        #nextBtn {
+            background: #00ff88;
+            color: #120016;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="logo-round-container">
+        <div class="logo-display" id="logoDisplay" onclick="startQuiz()">
+            <img src="https://img.freepik.com/premium-vector/hand-lettering-typography-sign-let-s-start-isolated-hand-drawing_543785-648.jpg?semt=ais_hybrid&w=740&q=80"
+                alt="Start Quiz">
+        </div>
+
+        <div class="logo-info">
+            <div id="logoName">Logo Name</div>
+            <button class="btn" id="checkBtn" onclick="checkAnswer()" style="display:none;">Check Answer</button>
+            <button class="btn" id="nextBtn" onclick="nextLogo()">Next Logo</button>
+        </div>
+    </div>
+
+    <script>
+        const logos = [
+            { src: "https://blog.paperspace.com/content/images/size/w1050/2019/10/pytorch-logo-1.png", name: "PyTorch" },
+            { src: "https://images.prismic.io/sacra/9c3ebd54-fb24-442c-8e06-b438fb99ffa3_hf-logo.png?auto=compress,format", name: "Huggingface" },
+            { src: "https://yt3.googleusercontent.com/ytc/AIdro_lAp1zO3sFLjm6hBn_gH0nd3FzZ6c2GN5U85vwlbH1e9ME=s900-c-k-c0x00ffffff-no-rj", name: "Tensorflow" },
+            { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfRklXyWQy1ditXPl8oBPdbcdjxuiVU3Z3VA&s", name: "Opencv" },
+            { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvkRmsL7mAkXKS19fL0lQAMsck4AjD1WZy4Q&s", name: "NVIDIA" },
+            { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Matplotlib_icon.svg/250px-Matplotlib_icon.svg.png", name: "Matplotlib" },
+            { src: "https://github.gallerycdn.vsassets.io/extensions/github/copilot/1.388.0/1761326434179/Microsoft.VisualStudio.Services.Icons.Default", name: "Github copilot" },
+            { src: "https://avatars.githubusercontent.com/u/9221727?s=280&v=4", name: "Ibm Watson" },
+            { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Kubernetes_logo_without_workmark.svg/960px-Kubernetes_logo_without_workmark.svg.png", name: "Kubernetes" },
+            { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeWaFEEhdbSquCHbTCflsXz-LaTzvxpnPNhQ&s", name: "hadoop" }
+        ];
+
+        const logoDisplay = document.getElementById("logoDisplay");
+        const logoName = document.getElementById("logoName");
+        const checkBtn = document.getElementById("checkBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        let currentIndex = 0;
+        let quizStarted = false;
+
+        function startQuiz() {
+            if (!quizStarted) {
+                quizStarted = true;
+                showLogo(currentIndex);
+                checkBtn.style.display = "inline-block";
+            }
+        }
+
+        function showLogo(index) {
+            logoDisplay.innerHTML = `<img src="${logos[index].src}" alt="Logo ${index + 1}">`;
+            logoName.style.display = "none";
+            checkBtn.style.display = "inline-block";
+            nextBtn.style.display = "none";
+        }
+
+        function checkAnswer() {
+            logoName.innerText = logos[currentIndex].name;
+            logoName.style.display = "block";
+            checkBtn.style.display = "none";
+            nextBtn.style.display = "inline-block";
+        }
+
+        function nextLogo() {
+            currentIndex++;
+            if (currentIndex < logos.length) {
+                showLogo(currentIndex);
+            } else {
+                logoDisplay.innerHTML = "<h2>Round Completed!</h2>";
+                logoName.style.display = "none";
+                checkBtn.style.display = "none";
+                nextBtn.style.display = "none";
+            }
+        }
+    </script>
+</body>
+
+</html>
