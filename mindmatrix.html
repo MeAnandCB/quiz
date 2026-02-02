@@ -20,7 +20,6 @@
             overflow: hidden;
         }
 
-        /* ✅ BACKGROUND IMAGE */
         body {
             background: url("images/round3.jpg") no-repeat center center / cover;
             display: flex;
@@ -29,7 +28,6 @@
             color: #fff;
         }
 
-        /* ✅ GLASS OVERLAY */
         .quiz-container {
             width: 100vw;
             height: 100vh;
@@ -71,30 +69,13 @@
             color: #fff;
             border: 2px solid #00ffff;
             border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .options button:hover {
-            background: #ffd900;
-            color: #000;
-        }
-
-        .options button.selected {
-            background: #ffaa00;
-            color: #000;
-            border-color: #ffaa00;
+            cursor: default;
         }
 
         .options button.correct {
             background: #00ff00;
             color: #000;
             border-color: #00ff00;
-        }
-
-        .options button.wrong {
-            background: #ff4444;
-            border-color: #ff4444;
         }
 
         .controls {
@@ -119,7 +100,6 @@
             cursor: not-allowed;
         }
 
-        /* 🎉 CONFETTI */
         .confetti {
             position: absolute;
             width: 10px;
@@ -132,33 +112,6 @@
             to {
                 transform: translateY(600px) rotate(720deg);
                 opacity: 0;
-            }
-        }
-
-        /* ❌ SHAKE */
-        .shake {
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-10px);
-            }
-
-            50% {
-                transform: translateX(10px);
-            }
-
-            75% {
-                transform: translateX(-10px);
-            }
-
-            100% {
-                transform: translateX(0);
             }
         }
 
@@ -180,13 +133,13 @@
 
 <body>
 
-    <div class="quiz-container" id="quizContainer">
+    <div class="quiz-container">
         <h1>MIND MATRIX</h1>
         <div class="question" id="question"></div>
         <div class="options" id="options"></div>
 
         <div class="controls">
-            <button id="checkBtn" disabled>CHECK ANSWER</button>
+            <button id="checkBtn">CHECK ANSWER</button>
             <button id="nextBtn" disabled>NEXT QUESTION</button>
         </div>
     </div>
@@ -293,96 +246,45 @@
                 ],
                 ans: 2
             },
-            {
-                q: "Which machine learning algorithm is most sensitive to feature scaling?",
-                options: [
-                    "Decision Tree",
-                    "K-Nearest Neighbors (KNN)",
-                    "Random Forest",
-                    "Naive Bayes"
-                ],
-                ans: 1
-            },
-            {
-                q: "What is the primary purpose of backpropagation in neural networks?",
-                options: [
-                    "Initialize weights",
-                    "Update weights using gradients",
-                    "Normalize inputs",
-                    "Perform inference"
-                ],
-                ans: 1
-            },
-            {
-                q: "Which activation function outputs values strictly between 0 and 1?",
-                options: [
-                    "ReLU",
-                    "Tanh",
-                    "Sigmoid",
-                    "Softplus"
-                ],
-                ans: 2
-            }
+
         ];
 
-
         let current = 0;
-        let selected = null;
 
         const questionEl = document.getElementById("question");
         const optionsEl = document.getElementById("options");
         const checkBtn = document.getElementById("checkBtn");
         const nextBtn = document.getElementById("nextBtn");
-        const quizContainer = document.getElementById("quizContainer");
 
         function loadQuestion() {
-            selected = null;
-            checkBtn.disabled = true;
-            nextBtn.disabled = true;
             optionsEl.innerHTML = "";
+            nextBtn.disabled = true;
 
             questionEl.textContent = `Q${current + 1}. ${quizData[current].q}`;
 
-            quizData[current].options.forEach((opt, i) => {
+            quizData[current].options.forEach(opt => {
                 const btn = document.createElement("button");
                 btn.textContent = opt;
-                btn.onclick = () => selectOption(btn, i);
+                btn.disabled = true;
                 optionsEl.appendChild(btn);
             });
-        }
-
-        function selectOption(btn, index) {
-            document.querySelectorAll(".options button")
-                .forEach(b => b.classList.remove("selected"));
-
-            btn.classList.add("selected");
-            selected = index;
-            checkBtn.disabled = false;
         }
 
         checkBtn.onclick = () => {
             const buttons = document.querySelectorAll(".options button");
             const correct = quizData[current].ans;
 
-            buttons.forEach((btn, i) => {
-                if (i === correct) btn.classList.add("correct");
-                if (i === selected && selected !== correct) btn.classList.add("wrong");
-                btn.disabled = true;
-            });
+            buttons[correct].classList.add("correct");
+            createConfetti();
 
-            if (selected === correct) {
-                createConfetti();
-            } else {
-                quizContainer.classList.add("shake");
-                setTimeout(() => quizContainer.classList.remove("shake"), 500);
-            }
-
-            nextBtn.disabled = false;
             checkBtn.disabled = true;
+            nextBtn.disabled = false;
         };
 
         nextBtn.onclick = () => {
             current++;
+            checkBtn.disabled = false;
+
             if (current < quizData.length) {
                 loadQuestion();
             } else {
@@ -391,7 +293,7 @@
         };
 
         function createConfetti() {
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 40; i++) {
                 const confetti = document.createElement("div");
                 confetti.className = "confetti";
                 confetti.style.left = Math.random() * window.innerWidth + "px";

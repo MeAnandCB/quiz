@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>15 Sec Timer - XL</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #0f2027, #203a43, #2c5364);
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .timer-container {
+            text-align: center;
+            color: #fff;
+        }
+
+        .circle {
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            border: 18px solid #00ffcc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 140px;
+            font-weight: 900;
+            box-shadow: 0 0 60px rgba(0, 255, 204, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .warning {
+            border-color: orange;
+            box-shadow: 0 0 60px rgba(255, 165, 0, 0.7);
+        }
+
+        .danger {
+            border-color: red;
+            box-shadow: 0 0 70px rgba(255, 0, 0, 0.8);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        button {
+            margin-top: 40px;
+            padding: 18px 50px;
+            font-size: 22px;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            background: #00ffcc;
+            color: #000;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        button:hover {
+            background: #00ccb0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="timer-container">
+        <div class="circle" id="timer">15</div>
+        <button onclick="startTimer()">START</button>
+    </div>
+
+    <script>
+        let time = 15;
+        let interval;
+
+        function startTimer() {
+            clearInterval(interval);
+            time = 15;
+            updateUI();
+
+            interval = setInterval(() => {
+                time--;
+                updateUI();
+
+                if (time <= 0) {
+                    clearInterval(interval);
+                    document.getElementById("timer").innerText = "0";
+                }
+            }, 1000);
+        }
+
+        function updateUI() {
+            const timer = document.getElementById("timer");
+            timer.innerText = time;
+
+            timer.classList.remove("warning", "danger");
+
+            if (time <= 3) {
+                timer.classList.add("danger");
+            } else if (time <= 7) {
+                timer.classList.add("warning");
+            }
+        }
+    </script>
+
+</body>
+
+</html>
